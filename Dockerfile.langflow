@@ -1,0 +1,7 @@
+# Usar a imagem oficial do Langflow como base
+FROM langflowai/langflow:latest
+
+# Instalar utilitários e gerar o locale pt_BR.UTF-8
+RUN apt-get update && apt-get install -y locales && \
+    sed -i -e 's/# pt_BR.UTF-8 UTF-8/pt_BR.UTF-8 UTF-8/' /etc/locale.gen && \
+    locale-gen
