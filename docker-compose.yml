@@ -2,24 +2,21 @@ version: '3.8'
 
 services:
   langflowai:
+    # Esta seção continua igual, pois a customização do Langflow é necessária
     build:
       context: .
       dockerfile: Dockerfile.langflow
     restart: unless-stopped
     command: uvicorn langflow.main:create_app --host 0.0.0.0 --port 7860 --workers 4
     environment:
-      # --- VARIÁVEIS DE AUTENTICAÇÃO ---
+      # --- As variáveis continuam as mesmas ---
       - LANGFLOW_NEW_USER_IS_ACTIVE=true
       - LANGFLOW_SUPERUSER=${LANGFLOW_SUPERUSER}
       - LANGFLOW_SUPERUSER_PASSWORD=${LANGFLOW_SUPERUSER_PASSWORD}
-
-      # --- VARIÁVEIS DE IDIOMA E TIMEZONE ---
       - TZ=America/Sao_Paulo
       - LANG=pt_BR.UTF-8
       - LANGUAGE=pt_BR:pt:en
       - LC_ALL=pt_BR.UTF-8
-
-      # --- VARIÁVEIS DA APLICAÇÃO ---
       - LANGFLOW_DATABASE_URL=${LANGFLOW_DATABASE_URL}
       - LANGFLOW_CACHE_TYPE=redis
       - LANGFLOW_REDIS_URL=${LANGFLOW_REDIS_URL}
@@ -34,18 +31,13 @@ services:
       - sua_rede_backend # Use a mesma rede dos outros serviços
 
   postgres:
-    build:
-      context: .
-      dockerfile: Dockerfile.postgres
+    # --- MUDANÇA AQUI ---
+    # Removemos o 'build' e voltamos a usar a imagem oficial.
+    # A variável TZ é suficiente para o Postgres.
+    image: postgres:15-alpine
     restart: unless-stopped
     environment:
-      # Variáveis de Fuso Horário e Idioma
       - TZ=America/Sao_Paulo
-      - LANG=pt_BR.UTF-8
-      - LANGUAGE=pt_BR:pt:en
-      - LC_ALL=pt_BR.UTF-8
-
-      # Variáveis do Banco de Dados
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
