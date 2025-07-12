@@ -1,7 +1,20 @@
 # Usar a imagem oficial do Langflow como base
 FROM langflowai/langflow:latest
 
-# Instalar utilitários e gerar o locale pt_BR.UTF-8
-RUN apt-get update && apt-get install -y locales && \
+# Definir o frontend como não interativo para evitar prompts durante a instalação
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Executar a atualização, instalação e limpeza em uma única camada
+# para robustez e otimização de imagem.
+RUN apt-get update && \
+    apt-get install -y locales && \
     sed -i -e 's/# pt_BR.UTF-8 UTF-8/pt_BR.UTF-8 UTF-8/' /etc/locale.gen && \
-    locale-gen
+    dpkg-reconfigure --frontend=noninteractive locales && \
+    locale-gen pt_BR.UTF-8 && \
+    rm -rf /var/lib/apt/lists/*
+
+# Definir as variáveis de ambiente de localidade para toda a imagem
+# Isso é mais robusto do que definir no docker-compose
+ENV LANG=pt_BR.UTF-8
+ENV LANGUAGE=pt_BR:pt:en
+ENV LC_ALL=pt_BR.UTF-8
