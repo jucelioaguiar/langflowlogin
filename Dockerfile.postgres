@@ -1,5 +1,5 @@
 # Usar a imagem oficial do Postgres com base Alpine
 FROM postgres:15-alpine
 
-# Instalar o pacote que fornece suporte a locales no Alpine
-RUN apk add --no-cache libc-compat
+# Atualizar repositórios e instalar locale support
+RUN apk update && apk add --no-cache musl-locales musl-locales-lang
