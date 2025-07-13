@@ -1,8 +1,10 @@
-# Em Dockerfile.langflow
+# Dockerfile para Langflow
 FROM langflowai/langflow:latest
 
-# Instala o cliente do postgresql para que possamos usar o comando pg_isready
-RUN apt-get update && apt-get install -y --no-install-recommends postgresql-client && rm -rf /var/lib/apt/lists/*
+# Instala o cliente do postgresql
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copia o script de espera para dentro do contêiner
 COPY wait-for-postgres.sh /usr/local/bin/wait-for-postgres.sh
