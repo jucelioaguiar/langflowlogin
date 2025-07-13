@@ -29,6 +29,11 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_S3_REGION=auto
+      
+      # Variáveis necessárias para o script de espera
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     depends_on:
       postgres:
         condition: service_healthy
@@ -38,9 +43,7 @@ services:
       - sua_rede_backend
 
   postgres:
-    build:
-      context: .
-      dockerfile: Dockerfile.postgres
+    image: postgres:15-alpine
     restart: unless-stopped
     environment:
       - TZ=America/Sao_Paulo
