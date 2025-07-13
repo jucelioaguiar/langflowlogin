@@ -6,26 +6,23 @@ services:
     restart: unless-stopped
     command: uvicorn langflow.main:create_app --host 0.0.0.0 --port 7860 --workers 4
     environment:
-      # Variáveis para Login, Timezone e Idioma
       - LANGFLOW_NEW_USER_IS_ACTIVE=true
       - LANGFLOW_SUPERUSER=${LANGFLOW_SUPERUSER}
       - LANGFLOW_SUPERUSER_PASSWORD=${LANGFLOW_SUPERUSER_PASSWORD}
       - TZ=America/Sao_Paulo
       - LANG=pt_BR.UTF-8
-
-      # Variáveis da Aplicação
       - LANGFLOW_DATABASE_URL=${LANGFLOW_DATABASE_URL}
       - LANGFLOW_CACHE_TYPE=redis
-      - LANGFLOW_REDIS_URL=${LANGFLOW_REDIS_URL}/0
+      - LANGFLOW_REDIS_URL=${LANGFLOW_REDIS_URL}
       - AWS_S3_ENDPOINT_URL=${AWS_S3_ENDPOINT_URL}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_S3_REGION=auto
     depends_on:
-      - postgres
-      - redis
-    networks:
-      - sua_rede_backend
+      postgres:
+        condition: service_healthy # MUDANÇA CRÍTICA: Espera o postgres ficar saudável
+      redis:
+        condition: service_started
 
   postgres:
     image: postgres:15-alpine
@@ -37,17 +34,15 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - sua_rede_backend
+    healthcheck: # MUDANÇA CRÍTICA: Adiciona a verificação de saúde
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7-alpine
     restart: unless-stopped
-    networks:
-      - sua_rede_backend
 
 volumes:
   postgres_data: {}
-
-networks:
-  sua_rede_backend:
