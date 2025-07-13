@@ -2,12 +2,11 @@ version: '3.8'
 
 services:
   langflowai:
-    # Voltamos a usar a imagem oficial diretamente, sem build
     image: langflowai/langflow:latest
     restart: unless-stopped
     command: uvicorn langflow.main:create_app --host 0.0.0.0 --port 7860 --workers 4
     environment:
-      # Variáveis para Login, Timezone e Idioma (a UI do Langflow pode usar)
+      # Variáveis para Login, Timezone e Idioma
       - LANGFLOW_NEW_USER_IS_ACTIVE=true
       - LANGFLOW_SUPERUSER=${LANGFLOW_SUPERUSER}
       - LANGFLOW_SUPERUSER_PASSWORD=${LANGFLOW_SUPERUSER_PASSWORD}
@@ -26,7 +25,7 @@ services:
       - postgres
       - redis
     networks:
-      - sua_rede_backend # Use a mesma rede dos outros serviços
+      - sua_rede_backend
 
   postgres:
     image: postgres:15-alpine
@@ -52,4 +51,3 @@ volumes:
 
 networks:
   sua_rede_backend:
-    driver: coolify # Ou o nome da sua rede externa gerenciada pelo Coolify
